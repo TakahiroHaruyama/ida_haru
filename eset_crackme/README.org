@@ -3,13 +3,17 @@
 You can download the initial sample for the CrackMe challenge from [[https://join.eset.com/en/challenges/crack-me][here]].
 
 before:
+
 [[./img/eset_before.png]]
+
 after:
+
 [[./img/eset_after.png]]
 
-Reference:
-https://quequero.org/2016/01/eset-crackme-challenge-2015-walkthrough/
-http://mshetta.blogspot.jp/2016/11/join-eset-crackme-2015-solution.html
+** Reference
+
+- https://quequero.org/2016/01/eset-crackme-challenge-2015-walkthrough/
+- http://mshetta.blogspot.jp/2016/11/join-eset-crackme-2015-solution.html
 
 
 

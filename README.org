@@ -6,3 +6,6 @@ scripts for IDA Pro
 
 IDA Pro loader/processor modules for ESET CrackMe driver VM
 
+** stackstring_static
+
+IDAPython script statically-recovering strings constructed in stack

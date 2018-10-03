@@ -1,0 +1,21 @@
+* stackstring_static.py - IDAPython script statically-recovering strings constructed in stack
+
+The motivation is the same as [[https://www.fireeye.com/blog/threat-research/2014/08/flare-ida-pro-script-series-automatic-recovery-of-constructed-strings-in-malware.html][FireEye FLARE script]], but I implemented it statically without Vivisect a few years ago.
+
+Note: the script internally renames the stack variables so manually-renamed info in the function will be lost
+
+ASCII case:
+
+[[./img/sss_asc_after.jpg]]
+
+Unicode case:
+
+[[./img/sss_uni_after.jpg]]
+
+xor-decoding case:
+
+[[./img/sss_xor_after.jpg]]
+
+
+
+

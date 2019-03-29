@@ -9,3 +9,8 @@ IDA Pro loader/processor modules for ESET CrackMe driver VM
 ** stackstring_static
 
 IDAPython script statically-recovering strings constructed in stack
+
+** fn_fuzzy
+
+IDAPython script for fast multiple binary diffing triage
+

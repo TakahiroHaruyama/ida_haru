@@ -139,7 +139,6 @@ class FnCh(ida_kernwin.Choose):
         self.items = []
         for fva,v in sorted(self.mfn.items(), key=lambda x:x[1]['score'], reverse=True):
             if v['sfname']:
-                #self.items.append([get_name(fva), '{}'.format(v['pbsize']), v['sfname'], '{}'.format(v['score']), '{}'.format(v['cfg_match']), '{}'.format(v['sptype'])])
                 self.items.append(['{}'.format(v['score']), '{}'.format(v['cfg_match']), get_name(fva), '{}'.format(v['pbsize']), v['sfname'], '{}'.format(v['sptype'])])
         return True
 

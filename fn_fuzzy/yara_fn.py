@@ -9,7 +9,8 @@ the generated rule matches at least one segment in the current file.
 
 author: Willi Ballenthin <william.ballenthin@fireeye.com>
 '''
-#2018/8/6 Takahiro Haruyama modified to calculate fixup (relocation) size correctly and exclude direct memory reference data and other ignorable variable code
+# 2018/8/6 Takahiro Haruyama modified to calculate fixup (relocation) size correctly
+# and exclude direct memory reference data and other ignorable variable code
 
 import logging
 from collections import namedtuple

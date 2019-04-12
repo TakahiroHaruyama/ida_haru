@@ -66,10 +66,11 @@ def export(f_debug, idb_path, outdb, min_, f_ex_libthunk, f_update, f_ana_exp, a
     with idb.from_file(idb_path) as db:
         api = idb.IDAPython(db)
         try:
-            sha256 = api.ida_nalt.retrieve_input_file_sha256()
+            sha256 = api.ida_nalt.retrieve_input_file_sha256()            
         except KeyError:
             error('{}: ida_nalt.retrieve_input_file_sha256() failed. The API is supported in 6.9 or later idb version. Check the API on IDA for validation.'.format(idb_path))
             return 0
+        sha256 = sha256.lower()
     if f_remove:
         remove(cur, sha256)
         success('{}: the records successfully removed (SHA256={})'.format(idb_path, sha256))

@@ -19,7 +19,7 @@ g_min_bytes = 0x10 # minimum number of extracted code bytes per function
 g_analyzed_prefix = r'fn_' # analyzed function name prefix (regex)
 g_threshold = 50 # function similarity score threshold without CFG match
 g_threshold_cfg = 10 # function similarity score threshold with CFG match
-g_max_bytes_for_score = 0x80 # more code bytes are evaluated by only CFG match
+g_max_bytes_for_score = 0x100 # more code bytes are evaluated by only CFG match
 g_bsize_ratio = 40 # function binary size correction ratio to compare (40 is enough)
 
 # debug purpose to check one function matching

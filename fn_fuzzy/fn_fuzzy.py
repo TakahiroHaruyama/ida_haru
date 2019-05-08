@@ -13,10 +13,9 @@ import idautils, ida_nalt, ida_kernwin, idaapi, ida_expr
 import mmh3
 import yara_fn # modified version in the same folder
 
-g_debug = False
 g_db_path = r'Z:\haru\analysis\tics\fn_fuzzy.sqlite' # plz edit your path
 g_min_bytes = 0x10 # minimum number of extracted code bytes per function
-g_analyzed_prefix = r'fn_' # analyzed function name prefix (regex)
+g_analyzed_prefix = r'fn_|func_' # analyzed function name prefix (regex)
 g_threshold = 50 # function similarity score threshold without CFG match
 g_threshold_cfg = 10 # function similarity score threshold with CFG match
 g_max_bytes_for_score = 0x100 # more code bytes are evaluated by only CFG match
@@ -24,8 +23,8 @@ g_bsize_ratio = 40 # function binary size correction ratio to compare (40 is eno
 
 # debug purpose to check one function matching
 g_dbg_flag = False
-g_dbg_fva = 0xffffffff
-g_dbg_fname = ''
+g_dbg_fva = 0x0051B802
+g_dbg_fname = 'func_DecryptOrEncryptBuf'
 g_dbg_sha256 = ''
 
 # initialization for ssdeep
@@ -176,7 +175,7 @@ class SummaryCh(ida_kernwin.Choose):
             [ ["SHA256", 20 | ida_kernwin.Choose.CHCOL_PLAIN],
               ["total similar functions",   20 | ida_kernwin.Choose.CHCOL_DEC],
               ["analyzed similar functions",   20 | ida_kernwin.Choose.CHCOL_DEC],
-              ["idb path",   80 | ida_kernwin.Choose.CHCOL_PATH] ])
+              ["IDB path",   80 | ida_kernwin.Choose.CHCOL_PATH] ])
         self.items = []
 
     def OnInit(self):
@@ -222,11 +221,11 @@ General Options
 Export Options
 <update the DB records:{cUpdate}>
 <store flags as analyzed functions:{cAnaExp}>{cEGroup}>
-<analyzed function name prefix (regex):{iPrefix}>
+<analyzed function name prefix/suffix (regex):{iPrefix}>
 
 Compare Options
 <compare with only analyzed functions:{cAnaCmp}>
-<compare with only idbs in the specified folder:{cFolCmp}>{cCGroup}>
+<compare with only IDBs in the specified folder:{cFolCmp}>{cCGroup}>
 <the folder path:{iFolder}>
 <function code size comparison criteria (0-100):{iRatio}>
 <function similarity score threshold (0-100) without CFG match:{iSimilarity}>
@@ -501,7 +500,8 @@ class FnFuzzy(object):
                     score = fuzzy_lib.fuzzy_compare(pbuf, sbuf)
 
                     if g_dbg_flag and fva == g_dbg_fva and sfname == g_dbg_fname and sha256 == g_dbg_sha256:
-                        self.debug('{:#x}: compared with {} in {} score = {} machoc match = {}'.format(fva, sfname, sha256, score, bool(pfhm == sfhm)))
+                        #self.debug('{:#x}: compared with {} in {} score = {} machoc match = {}'.format(fva, sfname, sha256, score, bool(pfhm == sfhm)))
+                        print('{:#x}: compared with {} in {} score = {} machoc match = {}'.format(fva, sfname, sha256, score, bool(pfhm == sfhm)))
                         
                     if (score >= self.threshold) or (score >= self.threshold_cfg and pfhm == sfhm) or (pbsize > self.max_bytes_for_score and pfhm == sfhm):
                         res[sha256]['mcnt']['total'] += 1

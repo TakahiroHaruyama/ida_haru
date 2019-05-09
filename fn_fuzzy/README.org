@@ -4,7 +4,7 @@
 
 * Motivation
 
-See the [[https://conference.hitb.org/hitbsecconf2019ams/sessions/fn_fuzzy-fast-multiple-binary-diffing-triage-with-ida/][conference information]] or blog post (will be linked soon).
+See the [[https://conference.hitb.org/hitbsecconf2019ams/sessions/fn_fuzzy-fast-multiple-binary-diffing-triage-with-ida/][conference information]] or [[https://www.carbonblack.com/2019/05/09/fn_fuzzy-fast-multiple-binary-diffing-triage-with-ida/][blog]] post.
 
 * how to use
 

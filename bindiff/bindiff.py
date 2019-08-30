@@ -1,3 +1,6 @@
+# bindiff.py - BinDiff wrapper script for multiple binary diffing
+# Takahiro Haruyama (@cci_forensics)
+
 import argparse, subprocess, os, sqlite3, time, pickle, re, multiprocessing, Queue, sys, struct, logging
 from prettytable import PrettyTable
 import pefile

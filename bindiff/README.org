@@ -1,0 +1,124 @@
+#+OPTIONS: ^:{}
+
+#+TITLE: BinDiff wrapper script for multiple binary diffing
+
+* Purpose
+
+multiple binary diffing up to 100 samples (fn_fuzzy is better for more samples)
+
+* Requirements
+
+- IDA 7.3 and BinDiff 5.0
+- python packages: pefile, macholib, pyelftools, python-idb
+
+* How to Use
+
+Before using it, you have to edit the paths for executables/scripts in bindiff.py.
+#+BEGIN_SRC 
+# paths (should be edited)
+g_out_dir = r'Z:\haru\analysis\tics\bindiff_db' 
+g_ida_dir = r'C:\work\tool\IDAx64'
+g_exp_path = r'Z:\cloud\gd\work\python\IDAPython\bindiff\bindiff_export.idc'
+g_differ_path = r"C:\Program Files\BinDiff\bin\bindiff.exe"
+#+END_SRC
+
+You can check the command line options by -h or --help.
+#+BEGIN_EXAMPLE
+Z:\cloud\gd\work\python\IDAPython\bindiff>c:\python27-x64\python.exe bindiff.py -h
+usage: bindiff.py [-h] [--out_dir OUT_DIR] [--ws_th WS_TH] [--fs_th FS_TH]
+                  [--ins_th INS_TH] [--bb_th BB_TH] [--size_th SIZE_TH]
+                  [--debug] [--clear] [--noidb]
+                  primary {1,m} ...
+
+positional arguments:
+  primary               primary binary to compare
+  {1,m}                 mode: 1, m
+    1                   BinDiff 1 to 1
+    m                   BinDiff 1 to many
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --out_dir OUT_DIR, -o OUT_DIR
+                        output directory including .BinExport/.BinDiff
+                        (default: Z:\haru\analysis\tics\bindiff_db)
+  --ws_th WS_TH, -w WS_TH
+                        whole binary similarity threshold (default: 0.2)
+  --fs_th FS_TH, -f FS_TH
+                        function similarity threshold (default: 0.8)
+  --ins_th INS_TH, -i INS_TH
+                        instruction threshold (default: 30)
+  --bb_th BB_TH, -b BB_TH
+                        basic block threshold (default: 1)
+  --size_th SIZE_TH, -s SIZE_TH
+                        file size threshold (MB) (default: 10)
+  --debug, -d           print debug output (default: False)
+  --clear, -c           clear .BinExport, .BinDiff and function name cache
+                        (default: False)
+  --noidb, -n           skip a secondary binary without idb (default: False)
+#+END_EXAMPLE
+
+There are 2 modes. One is "1 to 1" mode, the other is "1 to many" mode.
+
+** "1 to 1" mode example
+
+In "1 to 1" mode, we should specify executable file paths for primary and secondary targets.
+
+#+BEGIN_EXAMPLE
+Z:\cloud\gd\work\python\IDAPython\bindiff>c:\python27-x64\python.exe bindiff.py Z:\haru\analysis\tics\hoge\[redacted]_worker_fixed
+1 Z:\haru\analysis\tics\hoge\samples\checked\[redacted]c2f05
+---------------------------------------------
+[*] BinDiff result
+[*] elapsed time = 0.390000104904 sec, number of diffing = 1
+[*] primary binary: (([redacted]_worker_fixed))
+
+============== 1 high similar binaries (>0.2) ================
++----------------+--------------------------------------+
+|   similarity   |           secondary binary           |
++----------------+--------------------------------------+
+| 0.211967127395 | [redacted]c2f05                      |
++----------------+--------------------------------------+
+---------------------------------------------
+#+END_EXAMPLE
+
+"high similar binaries" means some binaries are found with whole binary similarities. You can ajust the similarity by -w option.
+
+** "1 to many" mode example
+
+In "1 to many" mode, we should specify an executable file path for a primary target and a folder path for secondary targets. We can specify to compare secondary binaries recursively (-r option).
+
+#+BEGIN_EXAMPLE
+Z:\cloud\gd\work\python\IDAPython\bindiff>c:\python27-x64\python.exe bindiff.py Z:\haru\analysis\tics\hoge\samples\attacker\[redacted]_worker_fixed
+m Z:\haru\analysis\tics\hoge\samples\tmp
+---------------------------------------------
+[*] BinDiff result
+[*] elapsed time = 6.71900010109 sec, number of diffing = 3
+[*] primary binary: (([redacted]_worker_fixed))
+
+============== 10 high similar functions (>0.8), except high similar binaries ================
++----------------+--------------+--------------------------------+----------------+----------------------------------+-----------------+
+|   similarity   | primary addr |          primary name          | secondary addr |          secondary name          |secondary binary |
++----------------+--------------+--------------------------------+----------------+----------------------------------+-----------------+
+|      1.0       | 0x180067720  |       Virt_sub_180067720       |  0x180004c30   |          sub_180004c30           | [redacted]e6504 |
+|      1.0       | 0x1800674b0  |         sub_1800674b0          |  0x180004930   |          sub_180004930           | [redacted]e6504 |
+|      1.0       | 0x1800673a0  | chg_peparse_Virt_sub_1800673A0 |  0x180004820   |          sub_180004820           | [redacted]e6504 |
+|      1.0       | 0x1800672b0  |       Virt_sub_1800672B0       |  0x180004730   |          sub_180004730           | [redacted]e6504 |
+|      1.0       | 0x18005fd84  |         sub_18005fd84          |  0x13f69af94   |          sub_13f69af94           | [redacted]fb841 |
+|      1.0       | 0x18005fd84  |         sub_18005fd84          |  0x180012648   |         __crtMessageBoxW         | [redacted]e6504 |
+|      1.0       | 0x180050f30  |         sub_180050f30          |  0x1800019f0   | ?erase@?$basic_string@DU?$char_t | [redacted]e6504 |
+| 0.98987073046  | 0x1800677e0  | chg_peparse_Virt_sub_1800677E0 |  0x180004cf0   |          sub_180004cf0           | [redacted]e6504 |
+| 0.963708558784 | 0x180067560  |         sub_180067560          |  0x1800049e0   |          sub_1800049e0           | [redacted]e6504 |
+| 0.946399194338 | 0x180018780  |    chg_rotate_sub_180018780    |  0x140004360   |          sub_140004360           | [redacted]92023 |
++----------------+--------------+--------------------------------+----------------+----------------------------------+-----------------+
+---------------------------------------------
+#+END_EXAMPLE
+"high similar functions" means some functions are found with function similarities though they have lower whole binary similarities than the threshold. You can ajust the similarity by -f option.
+
+The function similarity result is very noisy so library/thunk functions are filtered out by the script. Additionally, we can specify the number of instructions/basic blocks, file size, and so on to reduce the noise.
+
+And by default, the script newly creates idbs for the target binaries if not found. If you want to only compare existing idbs, please specify -n.
+
+* Notes
+
+- BinDiff 5.0 contains a [[https://issuetracker.google.com/issues/129600738][bug]] that we can't load existing .BinDiff files and import symbols/comments due to missing .BinExport files. I hope it will be fixed soon. 
+
+

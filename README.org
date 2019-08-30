@@ -14,3 +14,6 @@ IDAPython script statically-recovering strings constructed in stack
 
 IDAPython script for fast multiple binary diffing triage
 
+** bindiff
+
+python script for multiple binary diffing by BinDiff

@@ -4,7 +4,7 @@
 
 * Purpose
 
-multiple binary diffing up to 100 samples (fn_fuzzy is better for more samples)
+multiple binary diffing up to 100 samples ([[https://github.com/TakahiroHaruyama/ida_haru/tree/master/fn_fuzzy][fn_fuzzy]] is better for more samples)
 
 * Requirements
 
@@ -80,7 +80,7 @@ Z:\cloud\gd\work\python\IDAPython\bindiff>c:\python27-x64\python.exe bindiff.py 
 ---------------------------------------------
 #+END_EXAMPLE
 
-"high similar binaries" means some binaries are found with whole binary similarities. You can ajust the similarity by -w option.
+"high similar binaries" means some binaries are found with whole binary similarities. You can adjust the similarity by -w option.
 
 ** "1 to many" mode example
 

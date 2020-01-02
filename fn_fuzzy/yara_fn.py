@@ -38,8 +38,8 @@ def get_basic_blocks(fva):
         return ret
 
     for bb in idaapi.FlowChart(func):
-        ret.append(BasicBlock(va=bb.startEA,
-                              size=bb.endEA - bb.startEA))
+        ret.append(BasicBlock(va=bb.start_ea,
+                              size=bb.end_ea - bb.start_ea))
 
     return ret
 
@@ -48,7 +48,7 @@ def get_function(va):
     '''
     return va for first instruction in function that contains given va.
     '''
-    return idaapi.get_func(va).startEA
+    return idaapi.get_func(va).start_ea
 
 
 Rule = namedtuple('Rule', ['name', 'bytes', 'masked_bytes', 'cut_bytes_for_hash'])
@@ -58,7 +58,7 @@ def is_jump(va):
     '''
     return True if the instruction at the given address appears to be a jump.
     '''
-    return GetMnem(va).startswith('j')
+    return print_insn_mnem(va).startswith('j')
 
 def get_fixup_va_and_size(va):
     fva = idaapi.get_next_fixup_ea(va)
@@ -79,7 +79,7 @@ def get_basic_block_rule(bb):
     va = bb.va
     while va < bb.va + bb.size:
         insns.append(va)
-        va = NextHead(va)
+        va = next_head(va)
 
     # drop the last instruction if its a jump
     if insns and is_jump(insns[-1]):
@@ -206,7 +206,7 @@ def get_segment_buffer(segstart):
     fetch the bytes of the section that starts at the given address.
     if the entire section cannot be accessed, try smaller regions until it works.
     '''
-    segend = idaapi.getseg(segstart).endEA
+    segend = idaapi.getseg(segstart).end_ea
     buf = None
     segsize = segend - segstart
     while buf is None and segsize > 0:
@@ -224,7 +224,7 @@ def get_segments():
     fetch the segments in the current executable.
     '''
     for segstart in idautils.Segments():
-         segend = idaapi.getseg(segstart).endEA
+         segend = idaapi.getseg(segstart).end_ea
          segsize = segend - segstart
          segname = str(SegName(segstart)).rstrip('\x00')
          segbuf = get_segment_buffer(segstart)

@@ -6,6 +6,7 @@ import cProfile
 from collections import defaultdict
 from pprint import PrettyPrinter
 from StringIO import StringIO
+from tqdm import tqdm
 
 from idc import *
 import idautils, ida_nalt, ida_kernwin, idaapi, ida_expr
@@ -352,11 +353,11 @@ class FnFuzzy(object):
         cur_id = 1
         for c in range(0,flow.size):
             cur_basic = flow.__getitem__(c)
-            cur_hash_rev += shex(cur_basic.startEA)+":"
-            addrIds.append((shex(cur_basic.startEA),str(cur_id)))
+            cur_hash_rev += shex(cur_basic.start_ea)+":"
+            addrIds.append((shex(cur_basic.start_ea),str(cur_id)))
             cur_id += 1
-            addr = cur_basic.startEA
-            blockEnd = cur_basic.endEA
+            addr = cur_basic.start_ea
+            blockEnd = cur_basic.end_ea
             mnem = GetMnem(addr)
             while mnem != "":
                 if mnem == "call": # should be separated into 2 blocks by call
@@ -372,7 +373,7 @@ class FnFuzzy(object):
                     mnem = GetMnem(addr)
             refs = []
             for suc in cur_basic.succs():
-                refs.append(suc.startEA)
+                refs.append(suc.start_ea)
             refs.sort()
             refsrev = ""
             for ref in refs:
@@ -474,7 +475,8 @@ class FnFuzzy(object):
         #sql = "SELECT sha256,fname,fhd,fhm,f_ana,ptype FROM function WHERE f_ana == 1 AND bsize BETWEEN ? AND ?" if self.f_ana_cmp else "SELECT sha256,fname,fhd,fhm,f_ana,ptype FROM function WHERE bsize BETWEEN ? AND ?"
         sql = "SELECT function.sha256,fname,fhd,fhm,f_ana,ptype FROM function INNER JOIN sample on function.sha256 == sample.sha256 WHERE path LIKE ? AND " if self.f_fol_cmp else "SELECT sha256,fname,fhd,fhm,f_ana,ptype FROM function WHERE "
         sql += "f_ana == 1 AND bsize BETWEEN ? AND ?" if self.f_ana_cmp else "bsize BETWEEN ? AND ?"
-        for fva in idautils.Functions():
+        fns = list(idautils.Functions())
+        for fva in tqdm(fns):
             fname = get_func_name(fva)
             if self.exclude_libthunk(fva, fname) or not num_of_samples:
                 continue

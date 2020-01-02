@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.ERROR) # to suppress python-idb warning
 # paths (should be edited)
 g_out_dir = r'Z:\haru\analysis\tics\bindiff_db' 
 g_ida_dir = r'C:\work\tool\IDAx64'
-g_exp_path = r'Z:\cloud\gd\work\python\IDAPython\bindiff\bindiff_export.idc'
+g_exp_path = r'Z:\cloud\gd\work\python\IDAPython\ida_haru\bindiff\bindiff_export.idc'
 g_differ_path = r"C:\Program Files\BinDiff\bin\bindiff.exe"
 #g_differ_path = r'C:\Program Files (x86)\zynamics\BinDiff 4.2\bin\differ64.exe'
 #g_save_fname_path = r'Z:\cloud\gd\work\python\IDAPython\bindiff\save_func_names.py'

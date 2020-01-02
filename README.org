@@ -1,6 +1,7 @@
+#+OPTIONS: ^:{}
 * ida_haru
 
-scripts for IDA Pro 
+scripts/plugins for IDA Pro 
 
 ** eset_crackme
 
@@ -17,3 +18,7 @@ IDAPython script for fast multiple binary diffing triage
 ** bindiff
 
 python script for multiple binary diffing by BinDiff
+
+** HexRaysDeob
+
+modified version for defeating APT10 ANEL's code obfuscations (located in a [[https://github.com/carbonblack/HexRaysDeob][corporate github repository]])

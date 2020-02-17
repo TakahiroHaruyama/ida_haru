@@ -139,7 +139,7 @@ class FnCh(ida_kernwin.Choose):
         self.items = []
         for fva,v in sorted(self.mfn.items(), key=lambda x:x[1]['score'], reverse=True):
             if v['sfname']:
-                self.items.append(['{}'.format(v['score']), '{}'.format(v['cfg_match']), get_name(fva), '{}'.format(v['pbsize']), v['sfname'], '{}'.format(v['sptype'])])
+                self.items.append(['{}'.format(v['score']), '{}'.format(v['cfg_match']), str(get_name(fva)), '{}'.format(v['pbsize']), str(v['sfname']), '{}'.format(v['sptype'])])
         return True
 
     def OnPopup(self, form, popup_handle):
@@ -182,8 +182,8 @@ class SummaryCh(ida_kernwin.Choose):
     def OnInit(self):
         for sha256,v in sorted(self.res.items(), key=lambda x:x[1]['mcnt']['total'], reverse=True):
             if v['mcnt']['total'] > 0:
-                self.items.append([sha256, '{}'.format(v['mcnt']['total']), '{}'.format(v['mcnt']['analyzed']), v['path']])
-        return True
+                self.items.append([str(sha256), '{}'.format(v['mcnt']['total']), '{}'.format(v['mcnt']['analyzed']), str(v['path'])])
+                return True
 
     def OnGetSize(self):
         return len(self.items)
@@ -326,7 +326,7 @@ class FnFuzzy(object):
             self.cur.execute("CREATE TABLE IF NOT EXISTS sample(sha256 UNIQUE, path)")
             #self.cur.execute("CREATE INDEX sha256_index ON sample(sha256)")
             self.cur.execute("CREATE INDEX path_index ON sample(path)")
-            self.cur.execute("CREATE TABLE IF NOT EXISTS function(sha256, fname, fhd, fhm, f_ana, bsize, ptype, UNIQUE(sha256, fname))")
+            self.cur.execute("CREATE TABLE IF NOT EXISTS function(sha256, fva, fname, fhd, fhm, f_ana, bsize, ptype, UNIQUE(sha256, fva))")
             self.cur.execute("CREATE INDEX f_ana_index ON function(f_ana)") 
             self.cur.execute("CREATE INDEX bsize_index ON function(bsize)")
 
@@ -453,10 +453,10 @@ class FnFuzzy(object):
                 idaapi.get_tinfo(fva, tinfo)
                 ptype = idaapi.print_tinfo('', 0, 0, idaapi.PRTYPE_1LINE, tinfo, fname, '')
                 ptype = ptype + ';' if ptype is not None else ptype                
-                records.append((self.sha256, fname, fhd, fhm, f_ana, bsize, ptype)) 
-                self.debug('EXPORT {}: ssdeep={} (size={}), machoc={} (num of CFG={})'.format(fname, fhd, bsize, fhm, cfgnum))
+                records.append((self.sha256, fva, fname, fhd, fhm, f_ana, bsize, ptype)) 
+                self.debug('EXPORT {} at {:#x}: ssdeep={} (size={}), machoc={} (num of CFG={})'.format(fname, fva, fhd, bsize, fhm, cfgnum))
 
-        self.cur.executemany("REPLACE INTO function values (?, ?, ?, ?, ?, ?, ?)", records)
+        self.cur.executemany("REPLACE INTO function values (?, ?, ?, ?, ?, ?, ?, ?)", records)
         success ('{} of {} functions exported'.format(pnum, tnum))
         return True
 
@@ -476,7 +476,7 @@ class FnFuzzy(object):
         sql = "SELECT function.sha256,fname,fhd,fhm,f_ana,ptype FROM function INNER JOIN sample on function.sha256 == sample.sha256 WHERE path LIKE ? AND " if self.f_fol_cmp else "SELECT sha256,fname,fhd,fhm,f_ana,ptype FROM function WHERE "
         sql += "f_ana == 1 AND bsize BETWEEN ? AND ?" if self.f_ana_cmp else "bsize BETWEEN ? AND ?"
         fns = list(idautils.Functions())
-        for fva in tqdm(fns):
+        for fva in tqdm(fns, desc='comparing functions'):
             fname = get_func_name(fva)
             if self.exclude_libthunk(fva, fname) or not num_of_samples:
                 continue
@@ -555,6 +555,9 @@ def main():
     info('start')
         
     if idaapi.get_plugin_options("fn_fuzzy"): # CLI (export only)
+        # not change the database to maintain the window setting
+        process_config_line("ABANDON_DATABASE=YES")
+        
         start = time.time()
         options = idaapi.get_plugin_options("fn_fuzzy").split(':')
         #print options

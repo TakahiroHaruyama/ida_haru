@@ -32,8 +32,8 @@ def init_db(cur):
         info('DB initialized')
         cur.execute("CREATE TABLE IF NOT EXISTS sample(sha256 UNIQUE, path)")
         #cur.execute("CREATE INDEX sha256_index ON sample(sha256)")
-        cur.execute("CREATE INDEX path_index ON sample(path)")        
-        cur.execute("CREATE TABLE IF NOT EXISTS function(sha256, fname, fhd, fhm, f_ana, bsize, ptype, UNIQUE(sha256, fname))")        
+        cur.execute("CREATE INDEX path_index ON sample(path)")
+        cur.execute("CREATE TABLE IF NOT EXISTS function(sha256, fva, fname, fhd, fhm, f_ana, bsize, ptype, UNIQUE(sha256, fva))")
         cur.execute("CREATE INDEX f_ana_index ON function(f_ana)")        
         cur.execute("CREATE INDEX bsize_index ON function(bsize)")
 

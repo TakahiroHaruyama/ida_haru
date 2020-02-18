@@ -24,8 +24,8 @@ g_bsize_ratio = 40 # function binary size correction ratio to compare (40 is eno
 
 # debug purpose to check one function matching
 g_dbg_flag = False
-g_dbg_fva = 0x0051B802
-g_dbg_fname = 'func_DecryptOrEncryptBuf'
+g_dbg_fva = 0x180015978
+g_dbg_fname = 'fn_blob_get_word_param_and_seek'
 g_dbg_sha256 = ''
 
 # initialization for ssdeep
@@ -183,8 +183,8 @@ class SummaryCh(ida_kernwin.Choose):
         for sha256,v in sorted(self.res.items(), key=lambda x:x[1]['mcnt']['total'], reverse=True):
             if v['mcnt']['total'] > 0:
                 self.items.append([str(sha256), '{}'.format(v['mcnt']['total']), '{}'.format(v['mcnt']['analyzed']), str(v['path'])])
-                return True
-
+        return True
+            
     def OnGetSize(self):
         return len(self.items)
 
@@ -502,11 +502,13 @@ class FnFuzzy(object):
                     sbuf = ctypes.create_string_buffer(sfhd)
                     score = fuzzy_lib.fuzzy_compare(pbuf, sbuf)
 
-                    if g_dbg_flag and fva == g_dbg_fva and sfname == g_dbg_fname and sha256 == g_dbg_sha256:
-                        #self.debug('{:#x}: compared with {} in {} score = {} machoc match = {}'.format(fva, sfname, sha256, score, bool(pfhm == sfhm)))
+                    dbg_cond = g_dbg_flag and fva == g_dbg_fva and sfname == g_dbg_fname and sha256 == g_dbg_sha256
+                    if dbg_cond:
                         print('{:#x}: compared with {} in {} score = {} machoc match = {}'.format(fva, sfname, sha256, score, bool(pfhm == sfhm)))
                         
                     if (score >= self.threshold) or (score >= self.threshold_cfg and pfhm == sfhm) or (pbsize > self.max_bytes_for_score and pfhm == sfhm):
+                        if dbg_cond:
+                            print('{:#x}: counting {} in {} for total number'.format(fva, sfname, sha256))
                         res[sha256]['mcnt']['total'] += 1
                         if sf_ana:
                             res[sha256]['mcnt']['analyzed'] += 1
@@ -516,7 +518,10 @@ class FnFuzzy(object):
                                 res[sha256]['mfn'][fva]['sfname'] = sfname
                                 res[sha256]['mfn'][fva]['sptype'] = sptype
                                 res[sha256]['mfn'][fva]['pbsize'] = pbsize
+                                if dbg_cond:
+                                    print('{:#x}: appended record = {} in {}'.format(fva, sfname, sha256))
 
+        
         c = SummaryCh("fn_fuzzy summary", res)
         c.Show()
         success('totally {} samples compared'.format(num_of_samples))

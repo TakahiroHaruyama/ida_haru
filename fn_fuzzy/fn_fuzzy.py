@@ -452,8 +452,9 @@ class FnFuzzy(object):
                 tinfo = idaapi.tinfo_t()
                 idaapi.get_tinfo(fva, tinfo)
                 ptype = idaapi.print_tinfo('', 0, 0, idaapi.PRTYPE_1LINE, tinfo, fname, '')
-                ptype = ptype + ';' if ptype is not None else ptype                
-                records.append((self.sha256, fva, fname, fhd, fhm, f_ana, bsize, ptype)) 
+                ptype = ptype + ';' if ptype is not None else ptype
+                # fva is 64-bit int causing OverflowError
+                records.append((self.sha256, '{:#x}'.format(fva), fname, fhd, fhm, f_ana, bsize, ptype)) 
                 self.debug('EXPORT {} at {:#x}: ssdeep={} (size={}), machoc={} (num of CFG={})'.format(fname, fva, fhd, bsize, fhm, cfgnum))
 
         self.cur.executemany("REPLACE INTO function values (?, ?, ?, ?, ?, ?, ?, ?)", records)

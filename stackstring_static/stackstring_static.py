@@ -7,6 +7,8 @@ import struct
 from ida_ua import *
 from ida_allins import *
 from idautils import *
+#from ida_funcs import *
+from idc import *
 import ida_kernwin
 
 def extract_unicode(data):
@@ -19,7 +21,7 @@ def extract_ascii(data):
 
 class StackString(object):
 
-    def __init__ (self, start, end, debug, do_xor):
+    def __init__ (self, start, end, debug, do_xor, static_xor_key):
         self.start = start
         self.end = end
         self.debug = debug
@@ -28,6 +30,7 @@ class StackString(object):
         self.stack_chars = {}
         self.xor_vars = {}
         self.stack_imm = None
+        self.static_xor_key = static_xor_key
 
     def rename_vars(self):
         stack = GetFrame(self.start)
@@ -335,10 +338,14 @@ class StackString(object):
             print('the string is not null-terminated: {}'.format(repr(''.join(result))))
 
         stack = GetFrame(self.start)
+        results = []
         for offset, name, size in StructMembers(stack):
             if name in strings:
-                if self.do_xor and name in self.xor_vars:
-                    k = self.xor_vars[name]
+                if self.do_xor:
+                    if name in self.xor_vars:
+                        k = self.xor_vars[name]
+                    else:
+                        k = self.static_xor_key
                     res = ''.join([chr(ord(x) ^ k) for x in strings[name][:-1]])
                     #print k
                     print '{} (xor-decoded): {} ({})'.format(name, repr(res), repr(strings[name]))
@@ -347,6 +354,15 @@ class StackString(object):
                     res = strings[name]
                 if res[0] != '\x00':
                     SetMemberComment(stack, offset, repr(res.rstrip('\x00')), 1)
+                    results.append(repr(res.rstrip('\x00')))
+
+        # set comment at the function start ea
+        if results:
+            cmt = ', '.join(results)
+            if len(cmt) < 128:
+                set_func_cmt(self.start, cmt, True)
+            else:
+                set_func_cmt(self.start, 'a lot of stack strings recovered (need to be checked)', True)
 
         # restore analyzed names in stack
         AnalyzeArea(self.start, self.end)
@@ -362,15 +378,24 @@ stackstring_static
 <current function only:{cCurrentOnly}>
 <enable debug messages:{cDebug}>
 <enable xor decoding:{cDecode}>{cGroup}>
+<default xor value in hex (single byte):{iXorValue}>
 """,
         {
             'FormChangeCb': ida_kernwin.Form.FormChangeCb(self.OnFormChange),
             'cGroup': ida_kernwin.Form.ChkGroupControl(("cCurrentOnly", "cDebug", "cDecode")),
+            'iXorValue': ida_kernwin.Form.NumericInput(tp=ida_kernwin.Form.FT_HEX),
         })
 
     def OnFormChange(self, fid):
         if fid == -1:
             self.SetControlValue(self.cCurrentOnly, True)
+            self.EnableField(self.iXorValue, False)                
+        if fid == self.cDecode.id:
+            #print('cDecode changed: {}'.format(self.cDecode.checked))
+            #if self.cDecode.checked:
+            self.EnableField(self.iXorValue, True)
+            #else:
+                #self.EnableField(self.iXorValue, False)                
         return 1
 
 def main():
@@ -378,17 +403,18 @@ def main():
 
     f = SSSForm()
     f.Compile()
+    f.iXorValue.value = 0x55
     r = f.Execute()
     if r == 1: # Run
         if f.cCurrentOnly.checked:
             start = GetFunctionAttr(here(), FUNCATTR_START)
             end = GetFunctionAttr(here(), FUNCATTR_END)
-            ss = StackString(start, end, f.cDebug.checked, f.cDecode.checked)
+            ss = StackString(start, end, f.cDebug.checked, f.cDecode.checked, f.iXorValue.value)
             ss.traverse()
         else:
             for start in Functions():
                 end = GetFunctionAttr(start, FUNCATTR_END)
-                ss = StackString(start, end, f.cDebug.checked, f.cDecode.checked)
+                ss = StackString(start, end, f.cDebug.checked, f.cDecode.checked, f.iXorValue.value)
                 ss.traverse()
     else:  # Cancel
         print 'cancel'

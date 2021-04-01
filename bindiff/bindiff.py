@@ -136,7 +136,7 @@ class BinDiff(object):
         if os.path.exists(target_split + db_ext):
             return target_split + db_ext
         else:
-            return target + db_ext
+            return target + db_ext # for recent IDA versions
 
     def _get_ida_path(self, arch):
         #idaq = 'idaq.exe' if arch == '32-bit' else 'idaq64.exe'

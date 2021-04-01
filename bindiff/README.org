@@ -18,16 +18,17 @@ Before using it, you have to edit the paths for executables/scripts in bindiff.p
 # paths (should be edited)
 g_out_dir = r'Z:\haru\analysis\tics\bindiff_db' 
 g_ida_dir = r'C:\work\tool\IDAx64'
-g_exp_path = r'Z:\cloud\gd\work\python\IDAPython\bindiff\bindiff_export.idc'
+g_exp_path = r'Z:\cloud\gd\python\IDAPython\ida_haru\bindiff\bindiff_export.idc'
 g_differ_path = r"C:\Program Files\BinDiff\bin\bindiff.exe"
+#g_differ_path = r'C:\Program Files (x86)\zynamics\BinDiff 4.2\bin\differ64.exe'
+g_save_fname_path = r'Z:\cloud\gd\python\IDAPython\ida_haru\bindiff\save_func_names.py'
 #+END_SRC
 
 You can check the command line options by -h or --help.
 #+BEGIN_EXAMPLE
-Z:\cloud\gd\work\python\IDAPython\bindiff>c:\python27-x64\python.exe bindiff.py -h
-usage: bindiff.py [-h] [--out_dir OUT_DIR] [--ws_th WS_TH] [--fs_th FS_TH]
-                  [--ins_th INS_TH] [--bb_th BB_TH] [--size_th SIZE_TH]
-                  [--debug] [--clear] [--noidb]
+Z:\cloud\gd\work\python\IDAPython\bindiff>python bindiff.py -h
+usage: bindiff.py [-h] [--out_dir OUT_DIR] [--ws_th WS_TH] [--fs_th FS_TH] [--ins_th INS_TH] [--bb_th BB_TH] [--size_th SIZE_TH] [--func_regex FUNC_REGEX] [--debug]
+                  [--clear] [--noidb] [--use_pyidb]
                   primary {1,m} ...
 
 positional arguments:
@@ -39,8 +40,7 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --out_dir OUT_DIR, -o OUT_DIR
-                        output directory including .BinExport/.BinDiff
-                        (default: Z:\haru\analysis\tics\bindiff_db)
+                        output directory including .BinExport/.BinDiff (default: Z:\haru\analysis\tics\bindiff_db)
   --ws_th WS_TH, -w WS_TH
                         whole binary similarity threshold (default: 0.2)
   --fs_th FS_TH, -f FS_TH
@@ -51,10 +51,12 @@ optional arguments:
                         basic block threshold (default: 1)
   --size_th SIZE_TH, -s SIZE_TH
                         file size threshold (MB) (default: 10)
+  --func_regex FUNC_REGEX, -e FUNC_REGEX
+                        function name regex to reduce noise (default: sub_|fn_|chg_)
   --debug, -d           print debug output (default: False)
-  --clear, -c           clear .BinExport, .BinDiff and function name cache
-                        (default: False)
+  --clear, -c           clear .BinExport, .BinDiff and function name cache (default: False)
   --noidb, -n           skip a secondary binary without idb (default: False)
+  --use_pyidb           use python-idb (default: False)
 #+END_EXAMPLE
 
 There are 2 modes. One is "1 to 1" mode, the other is "1 to many" mode.
@@ -64,7 +66,7 @@ There are 2 modes. One is "1 to 1" mode, the other is "1 to many" mode.
 In "1 to 1" mode, we should specify executable file paths for primary and secondary targets.
 
 #+BEGIN_EXAMPLE
-Z:\cloud\gd\work\python\IDAPython\bindiff>c:\python27-x64\python.exe bindiff.py Z:\haru\analysis\tics\hoge\[redacted]_worker_fixed
+Z:\cloud\gd\work\python\IDAPython\bindiff>python bindiff.py Z:\haru\analysis\tics\hoge\[redacted]_worker_fixed
 1 Z:\haru\analysis\tics\hoge\samples\checked\[redacted]c2f05
 ---------------------------------------------
 [*] BinDiff result
@@ -87,7 +89,7 @@ Z:\cloud\gd\work\python\IDAPython\bindiff>c:\python27-x64\python.exe bindiff.py 
 In "1 to many" mode, we should specify an executable file path for a primary target and a folder path for secondary targets. We can specify to compare secondary binaries recursively (-r option).
 
 #+BEGIN_EXAMPLE
-Z:\cloud\gd\work\python\IDAPython\bindiff>c:\python27-x64\python.exe bindiff.py Z:\haru\analysis\tics\hoge\samples\attacker\[redacted]_worker_fixed
+Z:\cloud\gd\work\python\IDAPython\bindiff>python bindiff.py Z:\haru\analysis\tics\hoge\samples\attacker\[redacted]_worker_fixed
 m Z:\haru\analysis\tics\hoge\samples\tmp
 ---------------------------------------------
 [*] BinDiff result
@@ -119,6 +121,9 @@ And by default, the script newly creates idbs for the target binaries if not fou
 
 * Notes
 
-- BinDiff 5.0 contains a [[https://issuetracker.google.com/issues/129600738][bug]] that we can't load existing .BinDiff files and import symbols/comments due to missing .BinExport files. I hope it will be fixed soon. 
+- BinDiff 5.0 and later contains a [[https://issuetracker.google.com/issues/129600738][bug]] that we can't load existing .BinDiff files and import symbols/comments due to missing .BinExport files. I hope it will be fixed someday. 
+
+- python-idb doesn't work for IDA 7.6 IDBs. So by default it's not used (enable --use_pyidb option if needed)
+
 
 

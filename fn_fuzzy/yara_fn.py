@@ -268,10 +268,12 @@ def main():
         rule = create_yara_rule_for_function(fva)
         if rule:
             print(rule)
+            '''
             if test_yara_rule(rule):
                 logging.info('success: validated the generated rule')
             else:
                 logging.error('error: failed to validate generated rule')
+            '''
     else:
         for fva in idautils.Functions():
             print('-' * 80)

@@ -8,8 +8,8 @@ multiple binary diffing up to 100 samples ([[https://github.com/TakahiroHaruyama
 
 * Requirements
 
-- IDA 7.3 and BinDiff 5.0
-- python packages: pefile, macholib, pyelftools, python-idb
+- IDA 7.6 and BinDiff 6
+- python packages: pefile macholib pyelftools python-idb prettytable
 
 * How to Use
 

@@ -121,9 +121,10 @@ And by default, the script newly creates idbs for the target binaries if not fou
 
 * Notes
 
+- If you can't get the function similarities correctly, adjust the function similarity threshold (--fs_th), instruction threshold (--ins_th), basic block threshold (--bb_th) and function name filter rule (--func_regex) options. The script excludes the matches of small codes because function similarity results of multiple binaries are noisy.
+
 - BinDiff 5.0 and later contains a [[https://issuetracker.google.com/issues/129600738][bug]] that we can't load existing .BinDiff files and import symbols/comments due to missing .BinExport files. I hope it will be fixed someday. 
 
-- python-idb doesn't work for IDA 7.6 IDBs. So by default it's not used (enable --use_pyidb option if needed)
-
+- python-idb doesn't work for IDA 7.6 IDBs. So by default it's not used (enable --use_pyidb option if needed).
 
 

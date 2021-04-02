@@ -22,8 +22,8 @@ g_save_fname_path = r'Z:\cloud\gd\python\IDAPython\ida_haru\bindiff\save_func_na
 # parameters
 g_ws_th = 0.20 # whole binary similarity threshold
 g_fs_th = 0.80 # function similarity threshold
-g_ins_th = 30 # instruction threshold
-g_bb_th = 1 # basic block threshold
+g_ins_th = 10 # instruction threshold
+g_bb_th = 0 # basic block threshold
 g_size_th = 10 # file size threshold (MB)
 g_func_regex = r'sub_|fn_|chg_' # function name filter rule
 
@@ -166,7 +166,7 @@ class BinDiff(object):
     def _load_func_names_default(self, func_regex, path, ida_path):
         pickle_path = os.path.splitext(os.path.join(self._out_dir, os.path.basename(path)))[0] + '_func_names.pickle'
         if self._clear or not os.path.exists(pickle_path):
-            cmd = [ida_path, '-S{}'.format(g_save_fname_path), '-Osave_func_names:{}:{}'.format(func_regex, pickle_path), path]
+            cmd = [ida_path, '-A', '-S{}'.format(g_save_fname_path), '-Osave_func_names:{}:{}'.format(func_regex, pickle_path), path]
 
             self._dprint('saving function names for {}'.format(path))            
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -281,6 +281,7 @@ class BinDiff(object):
         self._dprint('whole binary similarity={} confidence={}'.format(ws, wc))
         c.execute("SELECT address1,address2,similarity,confidence FROM function WHERE similarity > ? and instructions > ? and basicblocks > ?", (self._fs_th, self._ins_th, self._bb_th))
         frows = c.fetchall()
+        self._dprint('{} similar functions detected'.format(len(frows)))
         conn.close()
 
         c_high_ws = {}
@@ -296,12 +297,14 @@ class BinDiff(object):
                                                            ida_path)
             for row in frows:
                 addr1, addr2, fs, fc = row
+                self._dprint('addr1={:#x}, addr2={:#x}, similarity={}, confidence={}'.format(addr1, addr2, fs, fc))
                 if addr1 in self._func_names and addr2 in func_names:
                     c_high_fs[(addr1, self._func_names[addr1], addr2, func_names[addr2], secondary)] = {'similarity':fs, 'confidence':fc}
-            if not c_high_fs:                
+            if not c_high_fs and not self._debug:
                 os.remove(self._get_BinDiff_path(secondary))
         else:
-            os.remove(self._get_BinDiff_path(secondary))
+            if not self._debug:
+                os.remove(self._get_BinDiff_path(secondary))
 
         #self._dprint(c_high_ws)
         #self._dprint(c_high_fs)
@@ -348,7 +351,7 @@ def main():
     parser.add_argument('--ins_th', '-i', type=int, default=g_ins_th, help="instruction threshold")
     parser.add_argument('--bb_th', '-b', type=int, default=g_bb_th, help="basic block threshold")    
     parser.add_argument('--size_th', '-s', type=int, default=g_size_th, help="file size threshold (MB)")
-    parser.add_argument('--func_regex', '-e', default=g_func_regex, help="function name regex to reduce noise")
+    parser.add_argument('--func_regex', '-e', default=g_func_regex, help="function name regex to include in the result")
     parser.add_argument('--debug', '-d', action='store_true', help="print debug output")
     parser.add_argument('--clear', '-c', action='store_true', help="clear .BinExport, .BinDiff and function name cache")
     parser.add_argument('--noidb', '-n', action='store_true', help="skip a secondary binary without idb")

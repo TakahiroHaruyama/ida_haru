@@ -21,11 +21,12 @@ g_save_fname_path = r'Z:\cloud\gd\python\IDAPython\ida_haru\bindiff\save_func_na
 
 # parameters
 g_ws_th = 0.20 # whole binary similarity threshold
-g_fs_th = 0.80 # function similarity threshold
+g_fs_th = 0.70 # function similarity threshold
 g_ins_th = 10 # instruction threshold
 g_bb_th = 0 # basic block threshold
 g_size_th = 10 # file size threshold (MB)
-g_func_regex = r'sub_|fn_|chg_' # function name filter rule
+#g_func_regex = r'sub_|fn_|chg_' # function name filter rule
+g_func_regex = r'.*' # function name filter rule
 
 class LocalError(Exception): pass
 class ProcExportError(LocalError): pass
@@ -128,6 +129,7 @@ class BinDiff(object):
 
     def _get_db_path_noext(self, target):
         return os.path.join(self._out_dir, os.path.splitext(os.path.basename(target))[0])
+        #return os.path.join(self._out_dir, os.path.basename(target))
 
     def _get_idb_path(self, target, arch):
         db_ext = '.idb' if arch == '32-bit' else '.i64'

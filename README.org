@@ -3,6 +3,14 @@
 
 scripts/plugins for IDA Pro 
 
+**Note: All Python scripts still require the IDA 6.95 bw-compatibility. **
+
+Enable it in cfg/idapython.cfg:
+#+BEGIN_SRC 
+// Should the plugin automatically load a 6.95 bw-compatibility layer?
+AUTOIMPORT_COMPAT_IDA695 = YES
+#+END_SRC
+
 ** eset_crackme
 
 IDA Pro loader/processor modules for ESET CrackMe driver VM

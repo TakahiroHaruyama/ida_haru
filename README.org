@@ -3,7 +3,7 @@
 
 scripts/plugins for IDA Pro 
 
-**Note: All Python scripts still require the IDA 6.95 bw-compatibility. **
+Note: All Python scripts still require the IDA 6.95 bw-compatibility.
 
 Enable it in cfg/idapython.cfg:
 #+BEGIN_SRC 
@@ -26,6 +26,10 @@ IDAPython script for fast multiple binary diffing triage
 ** bindiff
 
 python script for multiple binary diffing by BinDiff
+
+** ADVobfuscator
+
+IDAPython script deobfuscating ADVobfuscator strings, applied to a TrickBoot sample
 
 ** HexRaysDeob
 

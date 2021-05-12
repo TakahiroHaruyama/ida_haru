@@ -123,7 +123,7 @@ def get_basic_block_rule(bb):
         if bytes_ is None:
             return None
         for i, byte in enumerate(bytes_):
-            _bytes.append(ord(byte))
+            _bytes.append(byte)
             byte_addr = i + va
             if byte_addr in fixup_byte_addrs:
                 logging.debug('{:#x}: fixup byte (masked)'.format(byte_addr))
@@ -135,8 +135,8 @@ def get_basic_block_rule(bb):
                 logging.debug('{:#x}: Op2 masked byte'.format(byte_addr))
                 masked_bytes.append('??')
             else:
-                masked_bytes.append('%02X' % (ord(byte)))
-                cut_bytes_for_hash += byte
+                masked_bytes.append('%02X' % (byte))
+                cut_bytes_for_hash += chr(byte)
 
     return Rule('$0x%x' % (bb.va), _bytes, masked_bytes, cut_bytes_for_hash)
 
@@ -161,10 +161,10 @@ def format_rules(fva, rules):
     md5 = idautils.GetInputFileMD5()
     ret = []
     ret.append('rule a_{hash:s}_{name:s} {{'.format(
-        hash=md5,
+        hash=md5.hex(),
         name=safe_name))
     ret.append('  meta:')
-    ret.append('    sample_md5 = "{md5:s}"'.format(md5=md5))
+    ret.append('    sample_md5 = "{md5:s}"'.format(md5=md5.hex()))
     ret.append('    function_address = "0x{fva:x}"'.format(fva=fva))
     ret.append('    function_name = "{name:s}"'.format(name=name))
     ret.append('  strings:')
@@ -192,7 +192,7 @@ def create_yara_rule_for_function(fva):
             # ensure there at least MIN_BB_BYTE_COUNT
             #  non-masked bytes in the rule, or ignore it.
             # this will reduce the incidence of many very small matches.
-            unmasked_count = len(filter(lambda b: b != '??', rule.masked_bytes))
+            unmasked_count = len([b for b in rule.masked_bytes if b != '??'])
             if unmasked_count < MIN_BB_BYTE_COUNT:
                 continue
 
@@ -259,12 +259,12 @@ def test_yara_rule(rule):
 
 
 def main():
-    print 'Start'
+    print('Start')
     ans = ida_kernwin.ask_yn(0, 'define only selected function?')
     if ans:
         va = ScreenEA()
         fva = get_function(va)
-        print('-' * 80)
+        print(('-' * 80))
         rule = create_yara_rule_for_function(fva)
         if rule:
             print(rule)
@@ -276,11 +276,11 @@ def main():
             '''
     else:
         for fva in idautils.Functions():
-            print('-' * 80)
+            print(('-' * 80))
             rule = create_yara_rule_for_function(fva)
             if rule:
                 print(rule)
-    print 'Done'
+    print('Done')
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

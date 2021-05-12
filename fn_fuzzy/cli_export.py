@@ -18,13 +18,13 @@ class LocalError(Exception): pass
 class ProcExportError(LocalError): pass
 
 def info(msg):
-    print "[*] {}".format(msg)
+    print("[*] {}".format(msg))
 
 def success(msg):
-    print "[+] {}".format(msg)
+    print("[+] {}".format(msg))
 
 def error(msg):
-    print "[!] {}".format(msg)
+    print("[!] {}".format(msg))
 
 def init_db(cur):
     cur.execute("SELECT * FROM sqlite_master WHERE type='table'")

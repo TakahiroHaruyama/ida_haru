@@ -1,0 +1,25 @@
+* IDAPython script deobfuscating ADVobfuscator strings, applied to a TrickBoot sample
+
+The script requires [[https://github.com/fireeye/flare-emu][flare-emu]].
+The tested sample is [[https://www.virustotal.com/gui/file/c1f1bc58456cff7413d7234e348d47a8acfdc9d019ae7a4aba1afc1b3ed55ffa/details][491115422a6b94dc952982e6914adc39]] (TrickBot's UEFI firmware reconnaissance module called "TrickBoot").
+
+Note: We may not be able to reuse it for a different sample that was compiled with a different compiler or with different flags but I think the same approach (decoder function pattern matching + emulation) can be applied.
+
+A result example:
+
+#+BEGIN_SRC 
+[*] 0x1000a124: xor2-encoded function detected (size = 0x2f)
+[*] 0x1000b92c: emulating from 0x1000b71b to 0x1000b92c
+[+] 0x1000b92c: uefi_expl_port_writeDeviceIoControl() ERROR %d
+#+END_SRC
+
+[[./img/adv_result.png]]
+
+** Reference
+
+- https://github.com/andrivet/ADVobfuscator
+- https://eclypsium.com/2020/12/03/trickbot-now-offers-trickboot-persist-brick-profit/
+- [[http://antonioparata.blogspot.com/2020/06/deobfuscating-c-advobfuscator-with.html]]
+
+
+

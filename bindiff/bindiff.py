@@ -37,11 +37,11 @@ class ChildProcessError(LocalError): pass
 
 class BinDiff(object):
     
-    def __init__ (self, primary, out_dir, ws_th, fs_th, ins_th, bb_th, size_th, func_regex, debug=False, clear=False, noidb=False, use_pyidb=False):
+    def __init__ (self, primary, out_dir, ws_th, fs_th, ins_th, bb_th, size_th, func_regex, debug=False, clear=False, newidb=False, use_pyidb=False):
     #def __init__ (self, primary, out_dir, ws_th, fs_th, ins_th, bb_th, size_th, debug=False, clear=False, noidb=False, use_pyidb=False):        
         self._debug = debug
         self._clear = clear
-        self._noidb = noidb
+        self._newidb = newidb
         self._lock = multiprocessing.Lock()        
         self._primary = primary
         self._ws_th = ws_th
@@ -94,7 +94,7 @@ class BinDiff(object):
                 arch = '32-bit'
             else:
                 arch = '64-bit'
-        except pefile.PEFormatError as detail:
+        except (pefile.PEFormatError,KeyError) as detail:
             try:
                 self._dprint(detail)
                 m = MachO(path)
@@ -190,6 +190,9 @@ class BinDiff(object):
             return 0
 
         #cmd = [ida_path, '-A', '-S{}'.format(g_exp_path), '-OExporterModule:{}'.format(binexp_path), target]  # the .BinExport filename should be specified in 4.3
+        #if self._debug:
+            #cmd = [ida_path, '-S{}'.format(g_exp_path), '-OBinExportModule:{}'.format(binexp_path), target]
+        #else:
         cmd = [ida_path, '-A', '-S{}'.format(g_exp_path), '-OBinExportModule:{}'.format(binexp_path), target]
         #print cmd
         
@@ -250,7 +253,7 @@ class BinDiff(object):
 
         # skip if idb not found
         idb_path = self._get_idb_path(secondary, arch)
-        if self._noidb and not os.path.exists(idb_path):
+        if not self._newidb and not os.path.exists(idb_path):
             self._dprint('no existing idb (skipped): {}'.format(secondary))
             return True
         
@@ -356,7 +359,7 @@ def main():
     parser.add_argument('--func_regex', '-e', default=g_func_regex, help="function name regex to include in the result")
     parser.add_argument('--debug', '-d', action='store_true', help="print debug output")
     parser.add_argument('--clear', '-c', action='store_true', help="clear .BinExport, .BinDiff and function name cache")
-    parser.add_argument('--noidb', '-n', action='store_true', help="skip a secondary binary without idb")
+    parser.add_argument('--newidb', '-n', action='store_true', help="create an idb for the secondary binary")
     parser.add_argument('--use_pyidb', action='store_true', help="use python-idb")
     
     subparsers = parser.add_subparsers(dest='mode', help='mode: 1, m')
@@ -372,7 +375,7 @@ def main():
     if os.path.isfile(args.primary):
         start = time.time()
         try:
-            bd = BinDiff(args.primary, args.out_dir, args.ws_th, args.fs_th, args.ins_th, args.bb_th, args.size_th, args.func_regex, args.debug, args.clear, args.noidb, args.use_pyidb)
+            bd = BinDiff(args.primary, args.out_dir, args.ws_th, args.fs_th, args.ins_th, args.bb_th, args.size_th, args.func_regex, args.debug, args.clear, args.newidb, args.use_pyidb)
             #bd = BinDiff(args.primary, args.out_dir, args.ws_th, args.fs_th, args.ins_th, args.bb_th, args.size_th, args.debug, args.clear, args.noidb, args.use_pyidb)
             if args.mode == '1' and os.path.isfile(args.secondary):
                 if not bd.is_skipped(args.secondary):

@@ -8,5 +8,7 @@ static main()
     //Exit( 1 - RunPlugin("zynamics_binexport_9", 2 ));
     //Exit( 1 - RunPlugin("zynamics_binexport_8", 2 ));
     //Exit( 1 - RunPlugin("binexport10", 2 ));
-    Exit( 1 - RunPlugin("binexport11", 2 ));
+    //Exit( 1 - RunPlugin("binexport11", 2 ));
+    //RunPlugin("binexport12_ida", 2 );
+    Exit( 1 - RunPlugin("binexport12_ida", 2 ));
 }

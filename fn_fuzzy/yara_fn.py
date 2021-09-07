@@ -135,7 +135,7 @@ def get_basic_block_rule(bb):
                 logging.debug('{:#x}: Op2 masked byte'.format(byte_addr))
                 masked_bytes.append('??')
             else:
-                masked_bytes.append('%02X' % (byte))
+                masked_bytes.append('%02X' % (byte)) # for Python3
                 cut_bytes_for_hash += chr(byte)
 
     return Rule('$0x%x' % (bb.va), _bytes, masked_bytes, cut_bytes_for_hash)

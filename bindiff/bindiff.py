@@ -14,10 +14,10 @@ logging.basicConfig(level=logging.ERROR) # to suppress python-idb warning
 # paths (should be edited)
 g_out_dir = r'Z:\haru\analysis\tics\bindiff_db' 
 g_ida_dir = r'C:\work\tool\IDAx64'
-g_exp_path = r'Z:\cloud\gd\python\IDAPython\ida_haru\bindiff\bindiff_export.idc'
+g_exp_path = r'Z:\haru\analysis\python\IDAPython\ida_haru\bindiff\bindiff_export.idc'
 g_differ_path = r"C:\Program Files\BinDiff\bin\bindiff.exe"
 #g_differ_path = r'C:\Program Files (x86)\zynamics\BinDiff 4.2\bin\differ64.exe'
-g_save_fname_path = r'Z:\cloud\gd\python\IDAPython\ida_haru\bindiff\save_func_names.py'
+g_save_fname_path = r'Z:\haru\analysis\python\IDAPython\ida_haru\bindiff\save_func_names_7x.py'
 
 # parameters
 g_ws_th = 0.20 # whole binary similarity threshold
@@ -169,8 +169,10 @@ class BinDiff(object):
         pickle_path = os.path.splitext(os.path.join(self._out_dir, os.path.basename(path)))[0] + '_func_names.pickle'
         if self._clear or not os.path.exists(pickle_path):
             cmd = [ida_path, '-A', '-S{}'.format(g_save_fname_path), '-Osave_func_names:{}:{}'.format(func_regex, pickle_path), path]
+            #cmd = [ida_path, '-S{}'.format(g_save_fname_path), '-Osave_func_names:{}:{}'.format(func_regex, pickle_path), path]
 
-            self._dprint('saving function names for {}'.format(path))            
+            self._dprint('saving function names for {}'.format(path))
+            self._dprint(' '.join(cmd))
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = proc.communicate()            
             if proc.returncode != 0:

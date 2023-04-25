@@ -1,9 +1,9 @@
 #+OPTIONS: ^:{}
 * ida_haru
 
-scripts/plugins for IDA Pro 
+Scripts/plugins for IDA Pro
 
-Note: All Python scripts still require the IDA 6.95 bw-compatibility.
+Note: The bindiff wrapper and fn_fuzzy work on IDA 7.4 and later, but other old scripts still require the IDA 6.95 bw-compatibility.
 
 Enable it in cfg/idapython.cfg:
 #+BEGIN_SRC 

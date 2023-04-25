@@ -12,12 +12,11 @@ import idb
 logging.basicConfig(level=logging.ERROR) # to suppress python-idb warning
 
 # paths (should be edited)
-g_out_dir = r'Z:\haru\analysis\tics\bindiff_db' 
-g_ida_dir = r'C:\work\tool\IDAx64'
-g_exp_path = r'Z:\haru\analysis\python\IDAPython\ida_haru\bindiff\bindiff_export.idc'
+g_out_dir = r'C:\analysisw\tmp\bindiff'
+g_ida_dir = r'C:\analysisw\tool\IDA'
 g_differ_path = r"C:\Program Files\BinDiff\bin\bindiff.exe"
-#g_differ_path = r'C:\Program Files (x86)\zynamics\BinDiff 4.2\bin\differ64.exe'
-g_save_fname_path = r'Z:\haru\analysis\python\IDAPython\ida_haru\bindiff\save_func_names_7x.py'
+g_exp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bindiff_export.idc')
+g_save_fname_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'save_func_names_7x.py')
 
 # parameters
 g_ws_th = 0.20 # whole binary similarity threshold

@@ -3,13 +3,7 @@
 
 Scripts/plugins for IDA Pro
 
-Note: The bindiff wrapper and fn_fuzzy work on IDA 7.4 and later, but other old scripts still require the IDA 6.95 bw-compatibility.
-
-Enable it in cfg/idapython.cfg:
-#+BEGIN_SRC 
-// Should the plugin automatically load a 6.95 bw-compatibility layer?
-AUTOIMPORT_COMPAT_IDA695 = YES
-#+END_SRC
+Note: Old scripts don't work for IDA 8.x, but I leave them just for reference. 
 
 ** eset_crackme
 
@@ -34,3 +28,7 @@ IDAPython script deobfuscating ADVobfuscator strings, applied to a TrickBoot sam
 ** HexRaysDeob
 
 modified version for defeating APT10 ANEL's code obfuscations (located in a [[https://github.com/carbonblack/HexRaysDeob][corporate github repository]])
+
+** callstrings
+
+scripts for defeating "polymorphic stack strings" obfuscation used by Hodur sample

@@ -7,8 +7,8 @@ import logging
 logging.basicConfig(level=logging.ERROR) # to suppress python-idb warning
 
 # plz edit the following paths
-g_ida_dir = r'C:\work\tool\IDAx64'
-g_db_path = r'Z:\haru\analysis\tics\fn_fuzzy.sqlite'
+g_ida_dir = r'C:\analysisw\tool\IDA'
+g_db_path = r'C:\analysisw\tics\fn_fuzzy.sqlite'
 g_fn_fuzzy_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fn_fuzzy.py')
 
 g_min_bytes = 0x10 # minimum number of extracted code bytes per function
@@ -55,7 +55,7 @@ def export(f_debug, idb_path, outdb, min_, f_ex_libthunk, f_update, f_ana_exp, a
         return 0   
     with open(idb_path, 'rb') as f:
         sig = f.read(4)        
-    if sig != 'IDA1' and sig != 'IDA2':
+    if sig != b'IDA1' and sig != b'IDA2':
         return 0
 
     # check the database record for the idb
@@ -63,7 +63,7 @@ def export(f_debug, idb_path, outdb, min_, f_ex_libthunk, f_update, f_ana_exp, a
     conn = sqlite3.connect(outdb)
     cur = conn.cursor()
     init_db(cur)
-    with idb.from_file(idb_path) as db:
+    with idb.from_file(idb_path) as db: # Fix: Cause NameError. need to rewrite in IDA batch mode to calculate SHA256
         api = idb.IDAPython(db)
         try:
             sha256 = api.ida_nalt.retrieve_input_file_sha256()            

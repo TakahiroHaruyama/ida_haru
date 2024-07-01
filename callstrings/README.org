@@ -1,0 +1,17 @@
+#+OPTIONS: ^:{}
+* callstrings - deobfuscating Hodur's global string encryption
+
+- Recover strings using various methods (static decoding, emulation, IDA debug hook)
+- Apply API function types to the local variable pointers
+
+The script comparison is below:
+[[./img/comparison.png]]
+
+- As the comparison shows, ida_callstrings_dbg.py and ida_callstrings_flare_emu.py (except emulateSelection) can work for other malware.
+- As the reference slides say, it is recommended to use modified [[https://github.com/TakahiroHaruyama/flare-emu/tree/xorloop][flare-emu]] and [[https://github.com/TakahiroHaruyama/capa/tree/comment_insertion][CAPA]] to make ida_callstrings_flare_emu.py work better.
+
+** Reference
+
+- https://speakerdeck.com/takahiro_haruyama/the-art-of-malware-c2-scanning-how-to-reverse-and-emulate-protocol-obfuscated-by-compiler
+
+
